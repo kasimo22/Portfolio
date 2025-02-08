@@ -858,7 +858,7 @@
 					<div class="col-md-offset-1 col-md-5 col-sm-6">
 						<div class="single-contact-box">
 							<div class="contact-form">
-								<form action="https://formspree.io/f/mqaelger" method="POST">
+								<form id="email-form">
 									<div class="row">
 										<div class="col-sm-6 col-xs-12">
 											<div class="form-group">
@@ -885,17 +885,18 @@
 										<div class="col-sm-12">
 											<div class="form-group">
 												<textarea class="form-control" rows="8" id="comment"
-													placeholder="Message"></textarea>
+													placeholder="Message" name="message"></textarea>
 											</div><!--/.form-group-->
 										</div><!--/.col-->
 									</div><!--/.row-->
 									<div class="row">
 										<div class="col-sm-12">
 											<div class="single-contact-btn">
-												<a class="contact-btn" href="#" role="button">submit</a>
+												<button class="contact-btn" type="submit">Submit</button>
 											</div><!--/.single-single-contact-btn-->
 										</div><!--/.col-->
 									</div><!--/.row-->
+									<p id="form-status" style="display:none">Your form has been submitted!</p>
 								</form><!--/form-->
 							</div><!--/.contact-form-->
 						</div><!--/.single-contact-box-->
@@ -974,6 +975,42 @@
 				event.preventDefault();
 				const cardWindow = button.closest('.card-window'); // Get the parent card window of the clicked close button
 				cardWindow.classList.remove('show'); // Remove the show class
+			});
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+			const form = document.getElementById("email-form");
+
+			if (!form) {
+				console.error("Form not found! Check your form ID.");
+				return;
+			}
+
+			form.addEventListener("submit", function (event) {
+				event.preventDefault();
+
+				let formData = {};
+				new FormData(form).forEach((value, key) => formData[key] = value);
+
+				fetch("https://formspree.io/f/mqaelger", {
+					method: "POST",
+					body: JSON.stringify(formData),
+					headers: {
+						"Accept": "application/json",
+						"Content-Type": "application/json"
+					}
+				}).then(response => {
+					if (response.ok) {
+						document.getElementById("form-status").style.display = "block";
+						form.reset();
+					} else {
+						console.error("Form submission error:", response);
+						alert("There was an error submitting the form.");
+					}
+				}).catch(error => {
+					console.error("Network error:", error);
+					alert("Oops! There was a problem.");
+				});
 			});
 		});
 	</script>
